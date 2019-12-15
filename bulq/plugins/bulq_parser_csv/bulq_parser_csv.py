@@ -2,8 +2,8 @@ import csv
 
 from datetime import datetime
 
-from core.plugin import parser_plugin
-from core.coders import Coders
+from bulq.core.plugin import parser_plugin
+from bulq.core.coders import Coders
 
 
 class StreamWithCode:

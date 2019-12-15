@@ -2,8 +2,8 @@ import argparse
 
 import yaml
 
-from core.plugin import PluginManager, init_plugins
-from core.pipeline import PipelineBuilder
+from bulq.core.plugin import PluginManager, init_plugins
+from bulq.core.pipeline import PipelineBuilder
 
 
 def create_input_part(conf):

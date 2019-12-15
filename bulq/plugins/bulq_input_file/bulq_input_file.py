@@ -2,7 +2,7 @@ from apache_beam.io import Read
 from apache_beam.io.filebasedsource import FileBasedSource
 from apache_beam.io.filesystem import CompressedFile
 
-from core.plugin import PluginManager, input_plugin
+from bulq.core.plugin import PluginManager, input_plugin
 
 
 class CompressedStream:

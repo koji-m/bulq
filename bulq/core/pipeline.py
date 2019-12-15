@@ -1,7 +1,7 @@
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 
-from core.plugin import PluginManager
+from bulq.core.plugin import PluginManager
 
 
 class PipelineBuilder:

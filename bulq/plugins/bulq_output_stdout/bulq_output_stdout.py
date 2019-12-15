@@ -1,6 +1,6 @@
 import apache_beam as beam
 
-from core.plugin import output_plugin
+from bulq.core.plugin import output_plugin
 
 
 def to_csv_row(dct):

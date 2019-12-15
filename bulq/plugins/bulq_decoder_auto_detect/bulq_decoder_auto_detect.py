@@ -1,6 +1,6 @@
 from apache_beam.io.filesystem import CompressionTypes
 
-from core.plugin import decoder_plugin
+from bulq.core.plugin import decoder_plugin
 
 
 @decoder_plugin('auto_detect')

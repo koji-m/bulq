@@ -2,7 +2,7 @@ import apache_beam as beam
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
 from apache_beam.io.gcp.bigquery import BigQueryDisposition
 
-from core.plugin import output_plugin
+from bulq.core.plugin import output_plugin
 
 
 WRITE_DISPOSITION = {

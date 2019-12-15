@@ -1,4 +1,4 @@
-from core.plugin import executor_plugin
+from bulq.core.plugin import executor_plugin
 
 
 @executor_plugin('local')
