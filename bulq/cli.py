@@ -52,7 +52,7 @@ def pipeline_options_from(conf):
 
 def create_pipeline(conf):
     conf_dict = pipeline_options_from(conf)
-    conf_dict['setup_file'] = './bulq/setup.py'
+    conf_dict['setup_file'] = './setup.py'
     builder = PipelineBuilder(conf_dict, conf)
 
     return builder.build()
