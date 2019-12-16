@@ -86,6 +86,5 @@ def init_plugins():
     print(base_dir)
     mods = glob.glob(join(base_dir, f'plugins/*'))
     mods = [basename(f) for f in mods if isdir(f)]
-    print(mods)
     for mod in mods:
-        importlib.import_module(f'bulq.plugins.{mod}')
+        importlib.import_module(f'plugins.{mod}')
