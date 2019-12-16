@@ -51,8 +51,11 @@ def pipeline_options_from(conf):
 
 
 def create_pipeline(conf):
+    import bulq
+    import os
     conf_dict = pipeline_options_from(conf)
-    conf_dict['setup_file'] = './staging/setup.py'
+    bulq_dir = os.path.dirname(bulq.__file__)
+    conf_dict['setup_file'] = bulq_dir + '/staging/setup.py'
     builder = PipelineBuilder(conf_dict, conf)
 
     return builder.build()
