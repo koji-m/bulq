@@ -59,12 +59,11 @@ def create_pipeline(conf):
 
 
 def _copy_package():
-    import os
     import shutil
     import bulq
     from os.path import dirname
 
-    bulq_dir = dirname(bulq.__file__),
+    bulq_dir = dirname(bulq.__file__)
     shutil.copytree(
         bulq_dir,
         bulq_dir + '/staging/bulq'
