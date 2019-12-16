@@ -58,7 +58,25 @@ def create_pipeline(conf):
     return builder.build()
 
 
+def _copy_package():
+    import os
+    import shutil
+    import bulq
+    import os.path.dirname
+
+    bulq_dir = os.paht.dirname(bulq.__file__),
+    shutil.copytree(
+        bulq_dir,
+        bulq_dir + '/staging/bulq'
+    )
+    shutil.copyfile(
+        './setup.py',
+        bulq_dir + '/staging/setup.py'
+    )
+
+
 def run(args):
+    _copy_package()
     init_plugins()
     with open(args.conf_file, 'r') as f:
         conf = yaml.load(f)
