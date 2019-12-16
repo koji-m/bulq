@@ -62,9 +62,9 @@ def _copy_package():
     import os
     import shutil
     import bulq
-    import os.path.dirname
+    from os.path import dirname
 
-    bulq_dir = os.paht.dirname(bulq.__file__),
+    bulq_dir = dirname(bulq.__file__),
     shutil.copytree(
         bulq_dir,
         bulq_dir + '/staging/bulq'
