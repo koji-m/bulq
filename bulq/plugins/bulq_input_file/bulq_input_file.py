@@ -45,6 +45,8 @@ class FileSource(FileBasedSource):
 
 @input_plugin('file')
 class BulqInputFile:
+    VERSION = '0.0.1'
+
     def __init__(self, conf):
         self.path_prefix = conf['path_prefix']
         self.decoders_conf = conf['decoders']
@@ -68,3 +70,6 @@ class BulqInputFile:
                         self.decoders[0]
                      )))
         return file_read
+
+    def setup(self):
+        pass

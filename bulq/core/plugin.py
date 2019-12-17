@@ -25,6 +25,15 @@ class PluginManager:
     def fetch(self, category, name):
         return self.registries[category].fetch(name)
 
+    def fetch_all(self):
+        res = {}
+        for category in CATEGORIES:
+            reg = self.registries[category].fetch_all()
+            for name, klass in reg.items():
+                res[f'{category}_{name}'] = klass
+
+        return res
+
 
 class PluginRegistry:
     def __init__(self, category):
@@ -32,11 +41,13 @@ class PluginRegistry:
         self.table = {}
 
     def register(self, name, cls):
-        print(f"register {name}, {cls}")
         self.table[name] = cls
 
     def fetch(self, name):
         return self.table[name]
+
+    def fetch_all(self):
+        return self.table
 
 
 def executor_plugin(name):
@@ -83,9 +94,9 @@ def output_plugin(name):
 
 def init_plugins():
     base_dir = join(dirname(__file__), '..')
-    print(base_dir)
     mods = glob.glob(join(base_dir, f'plugins/*'))
     mods = [basename(f) for f in mods if isdir(f)]
-    print(mods)
     for mod in mods:
+        if mod.endswith('.dist-info'):
+            continue
         importlib.import_module(f'bulq.plugins.{mod}')

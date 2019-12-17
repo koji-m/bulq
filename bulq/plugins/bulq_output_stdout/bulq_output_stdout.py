@@ -17,3 +17,6 @@ class BulqOutputStdout:
 
     def build(self, p):
         return (p | beam.Map(to_csv_row))
+
+    def setup(self):
+        pass

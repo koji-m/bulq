@@ -13,3 +13,6 @@ class BulqExecutorLocal:
 
     def pipeline_config(self):
         return self._pipeline_conf
+
+    def setup(self):
+        pass

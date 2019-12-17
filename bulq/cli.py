@@ -1,9 +1,13 @@
 import argparse
+import subprocess
+import sys
+from os.path import dirname
 
 import yaml
 
 from bulq.core.plugin import PluginManager, init_plugins
 from bulq.core.pipeline import PipelineBuilder
+import bulq.plugins
 
 
 def create_input_part(conf):
@@ -33,58 +37,35 @@ def create_output_part(p, conf):
     return out_part
 
 
-DEFAULT_EXEC_CONFIG = {
-    'max_threads': 2,
-    'min_output_tasks': 1
-}
-
-
-def pipeline_options_from(conf):
-
-    exec_conf = conf.get('exec', DEFAULT_EXEC_CONFIG)
-    plugin = PluginManager().fetch('executor',
-                                   exec_conf.get('type', 'local'))
-    exec_plugin = plugin(exec_conf)
-    conf_dict = exec_plugin.pipeline_config()
-
-    return conf_dict
-
-
-def create_pipeline(conf):
-    import bulq
-    import os
-    conf_dict = pipeline_options_from(conf)
-    bulq_dir = os.path.dirname(bulq.__file__)
-    conf_dict['setup_file'] = bulq_dir + '/staging/setup.py'
-    builder = PipelineBuilder(conf_dict, conf)
-
-    return builder.build()
-
-
-def _copy_package():
-    import shutil
-    import bulq
-    from os.path import dirname
-
-    bulq_dir = dirname(bulq.__file__)
-    shutil.copytree(
-        bulq_dir,
-        bulq_dir + '/staging/bulq'
-    )
-    shutil.copyfile(
-        './setup.py',
-        bulq_dir + '/staging/setup.py'
-    )
-
-
 def run(args):
-    _copy_package()
     init_plugins()
     with open(args.conf_file, 'r') as f:
         conf = yaml.load(f)
 
-    pipe_line = create_pipeline(conf)
-    pipe_line.run()
+    p_builder = PipelineBuilder(conf)
+    pipeline_manager = p_builder.build()
+    pipeline_manager.run_pipeline()
+
+
+def install_plugin(args):
+    print(f'installing {args.package}')
+    plugin_dir = dirname(bulq.plugins.__file__)
+    res = subprocess.check_output([sys.executable,
+                                   '-m', 'pip', 'install',
+                                   args.package,
+                                   '-t', plugin_dir])
+    print(res.decode())
+
+
+def list_plugins(args):
+    init_plugins()
+    manager = PluginManager()
+    print('----- installed plugins -----')
+    for name, klass in manager.fetch_all().items():
+        version = ''
+        if hasattr(klass, 'VERSION'):
+            version = klass.VERSION
+        print(name, ':', version)
 
 
 def main():
@@ -99,6 +80,24 @@ def main():
                             default='config.yml')
     parser_run.set_defaults(handler=run)
 
+    # pip sub-command parser
+    parser_pip = subparsers.add_parser('pip', help='see `pip -h`')
+    pip_subparsers = parser_pip.add_subparsers()
+    parser_pip_install = pip_subparsers.add_parser(
+        'install', help='see `pip install -h`'
+    )
+    parser_pip_install.add_argument('package',
+                                    type=str,
+                                    help='package')
+                                    
+    parser_pip_install.set_defaults(handler=install_plugin)
+
+    parser_pip_list = pip_subparsers.add_parser(
+        'list', help='see `pip list -h`'
+    )
+                                   
+    parser_pip_list.set_defaults(handler=list_plugins)
+
     args = parser.parse_args()
     if hasattr(args, 'handler'):
         args.handler(args)
@@ -107,5 +106,5 @@ def main():
 
 
 if __name__ == '__main__':
-    print('starting bulq')
+    print('starting bulq...')
     main()
