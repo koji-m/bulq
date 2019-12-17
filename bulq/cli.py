@@ -10,33 +10,6 @@ from bulq.core.pipeline import PipelineBuilder
 import bulq.plugins
 
 
-def create_input_part(conf):
-    in_conf = conf['in']
-    plugin = PluginManager().fetch('input', in_conf['type'])
-    in_part = plugin(in_conf)
-
-    return in_part
-
-
-def create_filters_part(p, conf):
-    filter_part = p
-    filters_conf = conf.get('filters')
-    if filters_conf:
-        for filter_conf in filters_conf:
-            plugin = PluginManager.fetch('filter', filter_conf['type'])
-            filter_part = plugin(filter_part, filter_conf)
-
-    return filter_part
-
-
-def create_output_part(p, conf):
-    out_conf = conf['out']
-    plugin = PluginManager().fetch('output', out_conf['type'])
-    out_part = plugin(p, out_conf)
-
-    return out_part
-
-
 def run(args):
     init_plugins()
     with open(args.conf_file, 'r') as f:
@@ -89,13 +62,13 @@ def main():
     parser_pip_install.add_argument('package',
                                     type=str,
                                     help='package')
-                                    
+
     parser_pip_install.set_defaults(handler=install_plugin)
 
     parser_pip_list = pip_subparsers.add_parser(
         'list', help='see `pip list -h`'
     )
-                                   
+
     parser_pip_list.set_defaults(handler=list_plugins)
 
     args = parser.parse_args()

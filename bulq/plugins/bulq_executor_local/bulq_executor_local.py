@@ -11,7 +11,7 @@ class BulqExecutorLocal:
             'direct_num_workers': self._max_threads
         }
 
-    def pipeline_config(self):
+    def pipeline_options(self):
         return self._pipeline_conf
 
     def setup(self):
