@@ -8,6 +8,7 @@ import yaml
 from bulq.core.plugin import PluginManager, init_plugins
 from bulq.core.pipeline import PipelineBuilder
 import bulq.plugins
+import bulq.log
 
 
 def run(args):
@@ -70,6 +71,8 @@ def main():
     )
 
     parser_pip_list.set_defaults(handler=list_plugins)
+
+    bulq.log.setup()
 
     args = parser.parse_args()
     if hasattr(args, 'handler'):
