@@ -10,22 +10,17 @@ CONFIG_PATH = os.path.join(
     'log.yml'
 )
 
-logger = logging.getLogger(__name__)
-
 
 def setup(config_path=CONFIG_PATH, log_level=None):
-    logger.info('setup logging')
     if os.path.exists(config_path):
         with open(config_path, 'r') as f:
             config = yaml.load(f)
             if log_level:
                 config['root']['level'] = log_level.upper()
         logging.config.dictConfig(config)
-        logger.info('logging config loaded')
     else:
         if log_level:
             lv_value = getattr(logging, log_level.upper())
             logging.basicConfig(level=lv_value)
         else:
             logging.basicConfig(level=logging.INFO)
-        logger.info('logging level set (config file not found)')

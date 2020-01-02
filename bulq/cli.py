@@ -2,16 +2,22 @@ import argparse
 import subprocess
 import sys
 from os.path import dirname
+import logging
 
 import yaml
 
+from bulq.__version__ import __version__
 from bulq.core.plugin import PluginManager, init_plugins
 from bulq.core.pipeline import PipelineBuilder
 import bulq.plugins
 import bulq.log
 
 
+logger = logging.getLogger(__name__)
+
+
 def run(args):
+    logger.info('start running bulk load')
     init_plugins()
     with open(args.conf_file, 'r') as f:
         conf = yaml.load(f)
@@ -19,6 +25,7 @@ def run(args):
     p_builder = PipelineBuilder(conf)
     pipeline_manager = p_builder.build()
     pipeline_manager.run_pipeline()
+    logger.info('finished running bulk load')
 
 
 def install_plugin(args):
@@ -43,6 +50,9 @@ def list_plugins(args):
 
 
 def main():
+    bulq.log.setup()
+    logger.info(f'bulq v{__version__}')
+
     parser = argparse.ArgumentParser(description='bulq - simple bulk loader')
     subparsers = parser.add_subparsers()
 
@@ -72,8 +82,6 @@ def main():
 
     parser_pip_list.set_defaults(handler=list_plugins)
 
-    bulq.log.setup()
-
     args = parser.parse_args()
     if hasattr(args, 'handler'):
         args.handler(args)
@@ -82,5 +90,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print('starting bulq...')
     main()
