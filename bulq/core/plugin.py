@@ -1,9 +1,12 @@
 from os.path import dirname, basename, isdir, join
 import glob
 import importlib
+import logging
 
 
 CATEGORIES = ['input', 'output', 'decoder', 'parser', 'filter', 'executor']
+
+logger = logging.getLogger(__name__)
 
 
 class PluginManager:
@@ -93,10 +96,14 @@ def output_plugin(name):
 
 
 def init_plugins():
+    logger.info('initialize plugins')
     base_dir = join(dirname(__file__), '..')
     mods = glob.glob(join(base_dir, f'plugins/*'))
     mods = [basename(f) for f in mods if isdir(f)]
+    res = []
     for mod in mods:
-        if mod.endswith('.dist-info'):
+        if mod.endswith('.dist-info') or mod == '__pycache__':
             continue
         importlib.import_module(f'bulq.plugins.{mod}')
+        res.append(mod)
+    logger.info(f'plugins initilized: {", ".join(res)}')
