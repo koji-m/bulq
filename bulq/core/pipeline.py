@@ -4,7 +4,7 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from bulq.core.plugin import PluginManager
 
 
-DEFAULT_EXEC_CONFIG = {
+DEFAULT_RUNNER_CONFIG = {
     'max_threads': 2,
     'min_output_tasks': 1
 }
@@ -17,9 +17,9 @@ class PipelineBuilder:
     def build(self):
         manager = PluginManager()
 
-        exec_conf = self.conf.get('exec', DEFAULT_EXEC_CONFIG)
-        exec_plugin_cls = manager.fetch('executor',
-                                        exec_conf.get('type', 'local'))
+        run_conf = self.conf.get('run', DEFAULT_RUNNER_CONFIG)
+        runner_plugin_cls = manager.fetch('runner',
+                                       run_conf.get('type', 'direct'))
 
         in_conf = self.conf['in']
         input_plugin_cls = manager.fetch('input', in_conf['type'])
@@ -35,9 +35,9 @@ class PipelineBuilder:
         output_plugin_cls = manager.fetch('output', out_conf['type'])
 
         loaded_plugins = []
-        exec_plugin = exec_plugin_cls(exec_conf)
-        pipeline_opts = exec_plugin.pipeline_options()
-        loaded_plugins.append(exec_plugin)
+        runner_plugin = runner_plugin_cls(run_conf)
+        pipeline_opts = runner_plugin.pipeline_options()
+        loaded_plugins.append(runner_plugin)
 
         input_plugin = input_plugin_cls(in_conf)
         input_plugin.prepare(pipeline_opts)

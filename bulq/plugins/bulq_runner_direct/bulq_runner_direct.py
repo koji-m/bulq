@@ -1,8 +1,7 @@
-from bulq.core.plugin import executor_plugin
+from bulq.core.plugin_base import BulqRunnerPlugin
 
 
-@executor_plugin('local')
-class BulqExecutorLocal:
+class BulqRunnerDirect(BulqRunnerPlugin):
     def __init__(self, conf):
         self._conf = conf
         self._max_threads = self._conf['max_threads']

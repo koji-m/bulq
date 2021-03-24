@@ -7,9 +7,7 @@ import logging
 import yaml
 
 from bulq.__version__ import __version__
-from bulq.core.plugin import PluginManager, init_plugins
 from bulq.core.pipeline import PipelineBuilder
-import bulq.plugins
 import bulq.log
 
 
@@ -18,36 +16,13 @@ logger = logging.getLogger(__name__)
 
 def run(args):
     logger.info('start running bulk load')
-    init_plugins()
     with open(args.conf_file, 'r') as f:
-        conf = yaml.load(f)
+        conf = yaml.load(f, Loader=yaml.FullLoader)
 
     p_builder = PipelineBuilder(conf)
     pipeline_manager = p_builder.build()
     pipeline_manager.run_pipeline()
     logger.info('finished running bulk load')
-
-
-def install_plugin(args):
-    print(f'installing {args.package}')
-    plugin_dir = dirname(bulq.plugins.__file__)
-    res = subprocess.check_output([sys.executable,
-                                   '-m', 'pip', 'install',
-                                   args.package,
-                                   '-t', plugin_dir])
-    print(res.decode())
-
-
-def list_plugins(args):
-    init_plugins()
-    manager = PluginManager()
-    print('----- installed plugins -----')
-    for name, klass in manager.fetch_all().items():
-        version = ''
-        if hasattr(klass, 'VERSION'):
-            version = klass.VERSION
-        print(name, ':', version)
-
 
 def main():
     bulq.log.setup()
@@ -63,24 +38,6 @@ def main():
                             help='config file (default: config.yml)',
                             default='config.yml')
     parser_run.set_defaults(handler=run)
-
-    # pip sub-command parser
-    parser_pip = subparsers.add_parser('pip', help='see `pip -h`')
-    pip_subparsers = parser_pip.add_subparsers()
-    parser_pip_install = pip_subparsers.add_parser(
-        'install', help='see `pip install -h`'
-    )
-    parser_pip_install.add_argument('package',
-                                    type=str,
-                                    help='package')
-
-    parser_pip_install.set_defaults(handler=install_plugin)
-
-    parser_pip_list = pip_subparsers.add_parser(
-        'list', help='see `pip list -h`'
-    )
-
-    parser_pip_list.set_defaults(handler=list_plugins)
 
     args = parser.parse_args()
     if hasattr(args, 'handler'):

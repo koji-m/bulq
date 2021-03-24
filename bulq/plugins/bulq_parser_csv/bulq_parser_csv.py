@@ -2,7 +2,7 @@ import csv
 
 from datetime import datetime
 
-from bulq.core.plugin import parser_plugin
+from bulq.core.plugin import BulqParserPlugin
 from bulq.core.coders import Coders
 
 
@@ -56,8 +56,7 @@ def get_timestamp_formatter(f):
     return _timestamp_formatter
 
 
-@parser_plugin('csv')
-class BulqParserCsv:
+class BulqParserCsv(BulqParserPlugin):
     def __init__(self, stream, parser_conf):
         self.stream = stream
         self.delimiter = parser_conf.get('delimiter', ',')

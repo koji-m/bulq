@@ -2,7 +2,7 @@ from apache_beam.io import Read
 from apache_beam.io.filebasedsource import FileBasedSource
 from apache_beam.io.filesystem import CompressedFile
 
-from bulq.core.plugin import PluginManager, input_plugin
+from bulq.core.plugin import BulqInputPlugin, PluginManager
 
 
 class CompressedStream:
@@ -43,8 +43,7 @@ class FileSource(FileBasedSource):
             yield rec
 
 
-@input_plugin('file')
-class BulqInputFile:
+class BulqInputFile(BulqInputPlugin):
     VERSION = '0.0.1'
 
     def __init__(self, conf):

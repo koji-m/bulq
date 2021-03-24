@@ -1,0 +1,6 @@
+venv
+*.egg-info
+example/
+__pycache__
+
+*.swp

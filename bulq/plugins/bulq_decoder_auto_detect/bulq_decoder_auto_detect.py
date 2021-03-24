@@ -1,10 +1,9 @@
 from apache_beam.io.filesystem import CompressionTypes
 
-from bulq.core.plugin import decoder_plugin
+from bulq.core.plugin import BulqDecoderPlugin
 
 
-@decoder_plugin('auto_detect')
-class BulqDecoderAutoDetect:
+class BulqDecoderAutoDetect(BulqDecoderPlugin):
     @staticmethod
     def compression_type():
         return CompressionTypes.AUTO

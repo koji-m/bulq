@@ -2,18 +2,17 @@ from os.path import dirname, isdir
 import shutil
 
 import bulq
-from bulq.plugins import bulq_executor_dataflow
-from bulq.core.plugin import executor_plugin
+from bulq.plugins import bulq_runner_dataflow
+from bulq.core.plugin import BulqRunnerPlugin
 
 
 DF_SETUPFILE = 'dataflow_setup.py'
 WORKING_DIR = './.bulq_dataflow/'
 
 
-@executor_plugin('dataflow')
-class BulqExecutorDataflow:
+class BulqRunnerDataflow(BulqRunnerPlugin):
     def __init__(self, conf):
-        self._base_dir = dirname(bulq_executor_dataflow.__file__) + '/'
+        self._base_dir = dirname(bulq_runner_dataflow.__file__) + '/'
         self._staging_dir = self._base_dir + '.staging/'
         self._conf = conf
         self._pipeline_options = {
