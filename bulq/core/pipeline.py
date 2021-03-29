@@ -4,71 +4,45 @@ from apache_beam.options.pipeline_options import PipelineOptions
 from bulq.core.plugin import PluginManager
 
 
-DEFAULT_RUNNER_CONFIG = {
-    'max_threads': 2,
-    'min_output_tasks': 1
-}
-
-
 class PipelineBuilder:
     def __init__(self, conf):
         self.conf = conf
 
-    def build(self):
+    def load_plugins(self):
         manager = PluginManager()
 
-        run_conf = self.conf.get('run', DEFAULT_RUNNER_CONFIG)
-        runner_plugin_cls = manager.fetch('runner',
-                                       run_conf.get('type', 'direct'))
-
         in_conf = self.conf['in']
-        input_plugin_cls = manager.fetch('input', in_conf['type'])
+        self.input_plugin = manager.fetch('input', in_conf)
 
-        filter_plugin_cls = []
+        self.filter_plugins = []
         filters_conf = self.conf.get('filters', [])
         if filters_conf:
             for filter_conf in filters_conf:
-                filter_plugin_cls.append(
-                    manager.fetch('filter', filter_conf['type']))
+                self.filter_plugins.append(
+                    manager.fetch('filter', filter_conf))
 
         out_conf = self.conf['out']
-        output_plugin_cls = manager.fetch('output', out_conf['type'])
+        self.output_plugin = manager.fetch('output', out_conf)
 
-        loaded_plugins = []
-        runner_plugin = runner_plugin_cls(run_conf)
-        pipeline_opts = runner_plugin.pipeline_options()
-        loaded_plugins.append(runner_plugin)
-
-        input_plugin = input_plugin_cls(in_conf)
-        input_plugin.prepare(pipeline_opts)
-        loaded_plugins.append(input_plugin)
-        filter_plugins = [plugin(conf) for plugin, conf
-                          in zip(filter_plugin_cls, filters_conf)]
-        for plg in filter_plugins:
-            plg.prepare(pipeline_opts)
-            loaded_plugins.append(plg)
-        output_plugin = output_plugin_cls(out_conf)
-        output_plugin.prepare(pipeline_opts)
-        loaded_plugins.append(output_plugin)
-
+    def build(self, pipeline_opts):
         p_options = PipelineOptions.from_dictionary(pipeline_opts)
         p = beam.Pipeline(options=p_options)
-        in_part = input_plugin.build(p)
+        in_part = self.input_plugin.build(p)
         filter_part = in_part
-        for filter in filter_plugins:
+        for filter in self.filter_plugins:
             filter_part = filter.build(filter_part)
-        output_plugin.build(filter_part)
+        self.output_plugin.build(filter_part)
 
-        return PipelineManager(p, loaded_plugins)
+        return PipelineManager(p)
 
 
 class PipelineManager:
-    def __init__(self, pipeline, loaded_plugins):
+    def __init__(self, pipeline):
         self._pipeline = pipeline
-        self._loaded_plugins = loaded_plugins
 
     def run_pipeline(self):
-        for plg in self._loaded_plugins:
-            plg.setup()
+        PluginManager().setup_plugins()
 
-        self._pipeline.run()
+        result = self._pipeline.run()
+        result.wait_until_finish()
+

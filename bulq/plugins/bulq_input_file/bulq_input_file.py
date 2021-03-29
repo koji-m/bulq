@@ -20,26 +20,18 @@ class CompressedStream:
 
 
 class FileSource(FileBasedSource):
-    def __init__(self,
-                 file_pattern,
-                 decoders_conf,
-                 parser_conf,
-                 decoder):
-        super().__init__(file_pattern,
-                         compression_type=decoder.compression_type())
-        self._decoders_conf = decoders_conf
-        self._parser_conf = parser_conf
-        self._parser = PluginManager().fetch(
-            'parser',
-            self._parser_conf['type']
-        )
+    def __init__(self, file_pattern, parser, decoder):
+        super().__init__(
+            file_pattern,
+            compression_type=decoder.compression_type())
+        self._parser = parser
 
     def read_records(self, file_name, range_tracker):
-        self._file = self.open_file(file_name)
-        if isinstance(self._file, CompressedFile):
-            self._file = CompressedStream(self._file)
-        parser = self._parser(self._file, self._parser_conf)
-        for rec in parser:
+        file_ = self.open_file(file_name)
+        if isinstance(file_, CompressedFile):
+            file_ = CompressedStream(file_)
+        self._parser.set_stream(file_)
+        for rec in self._parser:
             yield rec
 
 
@@ -48,24 +40,19 @@ class BulqInputFile(BulqInputPlugin):
 
     def __init__(self, conf):
         self.path_prefix = conf['path_prefix']
-        self.decoders_conf = conf['decoders']
-        self.decoders = [PluginManager().fetch('decoder', d['type'])
-                         for d in self.decoders_conf]
+        self.decoders = [PluginManager().fetch('decoder', d_conf)
+                         for d_conf in conf['decoders']]
         if len(self.decoders) == 0:
             self.decoders.append(
-                PluginManager().fetch('decoder', 'auto_detect'))
+                PluginManager().fetch('decoder', {'type': 'auto_detect'}))
 
-        self.parser_conf = conf['parser']
-
-    def prepare(self, pipeline_options):
-        pass
+        self.parser = PluginManager().fetch('parser', conf['parser'])
 
     def build(self, p):
         file_read = (p
                      | Read(FileSource(
                         self.path_prefix + '*',
-                        self.decoders_conf,
-                        self.parser_conf,
+                        self.parser,
                         self.decoders[0]
                      )))
         return file_read

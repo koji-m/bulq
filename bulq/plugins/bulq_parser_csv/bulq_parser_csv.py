@@ -1,10 +1,12 @@
 import csv
-
 from datetime import datetime
+import logging
 
 from bulq.core.plugin import BulqParserPlugin
 from bulq.core.coders import Coders
 
+
+logger = logging.getLogger(__name__)
 
 class StreamWithCode:
     def __init__(self, stream, coder):
@@ -47,18 +49,19 @@ def boolean_formatter(s):
         return None
 
 
-def get_timestamp_formatter(f):
-    def _timestamp_formatter(s):
+class TimeStampFormatter:
+    def __init__(self, f):
+        self._f = f
+
+    def __call__(self, s):
         if s:
-            return datetime.strptime(s, f)
+            return datetime.strptime(s, self._f)
         else:
             return None
-    return _timestamp_formatter
 
 
 class BulqParserCsv(BulqParserPlugin):
-    def __init__(self, stream, parser_conf):
-        self.stream = stream
+    def __init__(self, parser_conf):
         self.delimiter = parser_conf.get('delimiter', ',')
         self.quote = parser_conf.get('quote', '"')
         self.escape = parser_conf.get('escape', '\\')
@@ -86,6 +89,7 @@ class BulqParserCsv(BulqParserPlugin):
 
         self.coder = Coders.get_coder(self.charset)
 
+    def set_stream(self, stream):
         class custom(csv.excel):
             delimiter = self.delimiter
             quotechar = self.quote
@@ -114,8 +118,8 @@ class BulqParserCsv(BulqParserPlugin):
             if col_t == 'timestamp':
                 formatters.append(
                     (col['name'],
-                     get_timestamp_formatter(
-                        col.get('format', self.default_date))))
+                     TimeStampFormatter(
+                         col.get('format', self.default_date))))
             elif col_t == 'long':
                 formatters.append(
                     (col['name'], int_formatter))
@@ -163,7 +167,7 @@ class BulqParserCsv(BulqParserPlugin):
                     except Exception as e:
                         if self.stop_on_invalid_record:
                             raise e
-                        print(f"skip record: {e}")
+                        logger.warning(f"skip record: {e}")
                         continue
 
                     yield res
@@ -178,3 +182,6 @@ class BulqParserCsv(BulqParserPlugin):
             self.allow_optional_columns,
             self.formatters
         )
+
+    def setup(self):
+        pass

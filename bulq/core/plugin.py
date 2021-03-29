@@ -37,6 +37,7 @@ STANDARD_PLUGINS = [
 
 class PluginManager:
     _instance = None
+    _loaded_plugins = []
 
     def __new__(cls):
         if cls._instance is None:
@@ -44,19 +45,48 @@ class PluginManager:
 
         return cls._instance
 
-    def fetch(self, category, name):
+    def fetch(self, category, conf_section):
+        name = conf_section['type']
         if f'{category}-{name}' in STANDARD_PLUGINS:
             distribution = 'bulq'
+            is_extra = False
         else:
             distribution = f'bulq-{category}-{name}'
+            is_extra = True
 
-        plugin_cls = pkg_resources.load_entry_point(
+        plugin_pkg = pkg_resources.load_entry_point(
             distribution,
             f'bulq.plugins.{category}',
             f'{name}'
         )
+        plugin_cls = plugin_pkg.plugin
         self.check_plugin(plugin_cls, category)
-        return plugin_cls
+
+        plugin = plugin_cls(conf_section)
+
+        self.__class__._loaded_plugins.append({
+            'package': plugin_pkg,
+            'instance': plugin,
+            'is_extra': is_extra,
+        })
+
+        return plugin
+
+    def setup_plugins(self):
+        for plugin in self.__class__._loaded_plugins:
+            plugin['instance'].setup()
+
+    def loaded_plugin_packages(self):
+        return [
+            plugin['package'].__name__
+            for plugin in self.__class__._loaded_plugins
+            if not plugin['is_extra']]
+
+    def loaded_extra_plugins(self):
+        return [
+            plugin
+            for plugin in self.__class__._loaded_plugins
+            if plugin['is_extra']]
 
     @staticmethod
     def check_plugin(plugin_cls, category):

@@ -18,21 +18,21 @@ setuptools.setup(
             f'bulq = {package_name}.cli:main'
         ],
         'bulq.plugins.runner': [
-            f'direct = {package_name}.plugins.bulq_runner_direct.bulq_runner_direct:BulqRunnerDirect',
-            f'dataflow = {package_name}.plugins.bulq_runner_dataflow.bulq_runner_dataflow:BulqRunnerDataflow',
+            f'direct = {package_name}.plugins.bulq_runner_direct',
+            f'dataflow = {package_name}.plugins.bulq_runner_dataflow',
         ],
         'bulq.plugins.input': [
-            f'file = {package_name}.plugins.bulq_input_file.bulq_input_file:BulqInputFile',
+            f'file = {package_name}.plugins.bulq_input_file',
         ],
         'bulq.plugins.output': [
-            f'stdout = {package_name}.plugins.bulq_output_stdout.bulq_output_stdout:BulqOutputStdout',
+            f'stdout = {package_name}.plugins.bulq_output_stdout',
         ],
         'bulq.plugins.decoder': [
-            f'auto_detect = {package_name}.plugins.bulq_decoder_auto_detect.bulq_decoder_auto_detect:BulqDecoderAutoDetect',
-            f'gzip = {package_name}.plugins.bulq_decoder_gzip.bulq_decoder_gzip:BulqDecoderGzip',
+            f'auto_detect = {package_name}.plugins.bulq_decoder_auto_detect',
+            f'gzip = {package_name}.plugins.bulq_decoder_gzip',
         ],
         'bulq.plugins.parser': [
-            f'csv = {package_name}.plugins.bulq_parser_csv.bulq_parser_csv:BulqParserCsv',
+            f'csv = {package_name}.plugins.bulq_parser_csv',
         ],
     }
 )

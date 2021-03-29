@@ -11,9 +11,6 @@ class BulqOutputStdout(BulqOutputPlugin):
     def __init__(self, conf):
         pass
 
-    def prepare(self, pipeline_options):
-        pass
-
     def build(self, p):
         return (p | beam.Map(to_csv_row))
 
