@@ -10,7 +10,7 @@ class BulqDecoderPlugin:
 class BulqParserPlugin:
     pass
 
-class BulqFilterPlugin:
+class BulqTransformPlugin:
     pass
 
 class BulqRunnerPlugin:

@@ -10,7 +10,7 @@ from bulq.core.plugin_base import (
     BulqOutputPlugin,
     BulqDecoderPlugin,
     BulqParserPlugin,
-    BulqFilterPlugin,
+    BulqTransformPlugin,
 )
 import bulq.plugins
 
@@ -23,7 +23,7 @@ PLUGIN_CLASS = {
     'output': BulqOutputPlugin,
     'decoder': BulqDecoderPlugin,
     'parser': BulqParserPlugin,
-    'filter': BulqFilterPlugin,
+    'transform': BulqTransformPlugin,
     'runner': BulqRunnerPlugin,
 }
 
