@@ -1,9 +1,11 @@
 import argparse
 import subprocess
 import sys
+import os
 from os.path import dirname
 import logging
 
+from jinja2 import Environment, FileSystemLoader
 import yaml
 
 from bulq.__version__ import __version__
@@ -22,6 +24,14 @@ DEFAULT_RUNNER_CONFIG = {
 logger = logging.getLogger(__name__)
 
 
+class EnvVars:
+    def __init__(self, environ):
+        self.env = environ
+
+    def __getattr__(self, key):
+        return self.env[key]
+
+
 def get_runner_plugin(conf, extra_packages):
     run_conf = conf.get('run', DEFAULT_RUNNER_CONFIG)
     manager = PluginManager()
@@ -30,8 +40,12 @@ def get_runner_plugin(conf, extra_packages):
 
 def run(args):
     logger.info('start running bulk load')
-    with open(args.conf_file, 'r') as f:
-        conf = yaml.load(f, Loader=yaml.FullLoader)
+    env = Environment(loader=FileSystemLoader('.'))
+    conf_template = env.get_template(args.conf_file)
+    env_vars = EnvVars(os.environ)
+    template_vars = {'env': env_vars}
+    conf_rendered = conf_template.render(template_vars)
+    conf = yaml.load(conf_rendered, Loader=yaml.FullLoader)
 
     runner_plugin = get_runner_plugin(conf, args.extra_packages)
     p_builder = PipelineBuilder(conf)

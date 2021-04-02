@@ -11,7 +11,7 @@ with open(os.path.join(project_root, package_name, '__version__.py')) as f:
 setuptools.setup(
     name='bulq',
     version=res['__version__'],
-    install_requires=['apache-beam[gcp]'],
+    install_requires=['apache-beam[gcp]', 'Jinja2'],
     packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [
