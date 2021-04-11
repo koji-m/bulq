@@ -13,7 +13,7 @@ class {{cookiecutter.plugin_class}}(BulqInputPlugin):
     def build(self, p):
         pipeline = (
             p
-            | 'Example' >> beam.Create([{'data': i} for i in range(10)])
+            | 'Input Example' >> beam.Create([{'data': i} for i in range(10)])
         )
         return pipeline
 
