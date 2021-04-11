@@ -72,6 +72,9 @@ def plugin_new(args):
     else:
         logger.error(f'plugin type must be in input|transform|output|parser|decoder|runner')
 
+def plugin_list(args):
+    PluginManager.list_plugins()
+
 def main():
     bulq.log.setup()
     logger.info(f'bulq v{__version__}')
@@ -98,6 +101,9 @@ def main():
                                    type=str,
                                    help='plugin id(snake_case)')
     parser_plugin_new.set_defaults(handler=plugin_new)
+
+    parser_plugin_list = parser_plugin_sub.add_parser('list', help='see `plugin list -h`')
+    parser_plugin_list.set_defaults(handler=plugin_list)
 
     args = parser.parse_args()
     if hasattr(args, 'handler'):

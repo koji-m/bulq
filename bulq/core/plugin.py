@@ -94,3 +94,9 @@ class PluginManager:
         if base_cls != PLUGIN_CLASS[category]:
             raise Exception(f'invalid plugin type: {base_cls}')
 
+    @staticmethod
+    def list_plugins():
+        for plugin_type in PLUGIN_CLASS.keys():
+            print(f'{plugin_type}:')
+            for entry_point in pkg_resources.iter_entry_points(f'bulq.plugins.{plugin_type}'):
+                print(f'  {entry_point.name}')
