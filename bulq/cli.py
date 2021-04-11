@@ -32,7 +32,7 @@ class EnvVars:
         return self.env[key]
 
 
-def get_runner_plugin(conf, extra_packages):
+def get_runner_plugin(conf):
     run_conf = conf.get('run', DEFAULT_RUNNER_CONFIG)
     manager = PluginManager()
     return manager.fetch('runner', run_conf)
@@ -47,13 +47,30 @@ def run(args):
     conf_rendered = conf_template.render(template_vars)
     conf = yaml.load(conf_rendered, Loader=yaml.FullLoader)
 
-    runner_plugin = get_runner_plugin(conf, args.extra_packages)
+    runner_plugin = get_runner_plugin(conf)
     p_builder = PipelineBuilder(conf)
     p_builder.load_plugins()
     with runner_plugin.pipeline_options() as pipeline_opts:
         pipeline_manager = p_builder.build(pipeline_opts)
         pipeline_manager.run_pipeline()
         logger.info('finished running bulk load')
+
+def plugin_new(args):
+    from cookiecutter.main import cookiecutter
+    if args.type in ('input', 'output', 'transform', 'parser', 'decoder', 'runner'):
+        template = f'{os.path.dirname(os.path.abspath(__file__))}/templates/{args.type}'
+        plugin_module = f'bulq_{args.type}_{args.plugin_id}'
+        plugin_class = ''.join([t.capitalize() for t in plugin_module.split('_')])
+        cookiecutter(
+            template,
+            no_input=True,
+            extra_context={
+                'plugin_id': args.plugin_id,
+                'plugin_module': plugin_module,
+                'plugin_class': plugin_class,
+            })
+    else:
+        logger.error(f'plugin type must be in input|transform|output|parser|decoder|runner')
 
 def main():
     bulq.log.setup()
@@ -68,13 +85,19 @@ def main():
                             type=str,
                             help='config file (default: config.yml)',
                             default='config.yml')
-    parser_run.add_argument('-e',
-                            '--extra_packages',
-                            type=str,
-                            action='append',
-                            help='extra packages for runner to use',
-                            default=[])
     parser_run.set_defaults(handler=run)
+
+    # plugin sub-command parser
+    parser_plugin = subparsers.add_parser('plugin', help='see `plugin -h`')
+    parser_plugin_sub = parser_plugin.add_subparsers()
+    parser_plugin_new = parser_plugin_sub.add_parser('new', help='see `plugin new -h`')
+    parser_plugin_new.add_argument('type',
+                                   type=str,
+                                   help='plugin type (input|transform|output|parser|decoder|runner)')
+    parser_plugin_new.add_argument('plugin_id',
+                                   type=str,
+                                   help='plugin id(snake_case)')
+    parser_plugin_new.set_defaults(handler=plugin_new)
 
     args = parser.parse_args()
     if hasattr(args, 'handler'):
