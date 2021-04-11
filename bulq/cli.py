@@ -79,7 +79,7 @@ def main():
     bulq.log.setup()
     logger.info(f'bulq v{__version__}')
 
-    parser = argparse.ArgumentParser(description='bulq - simple bulk loader')
+    parser = argparse.ArgumentParser(description='bulq - extensible ETL tool')
     subparsers = parser.add_subparsers()
 
     # run sub-command parser
