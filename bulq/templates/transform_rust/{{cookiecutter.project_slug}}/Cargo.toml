@@ -1,0 +1,14 @@
+[package]
+name = "{{ cookiecutter.project_slug }}"
+version = "0.1.0"
+authors = ["Your Name <your@email.address>"]
+edition = "2018"
+
+[lib]
+name = "{{ cookiecutter.plugin_module }}"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies.pyo3]
+version = "0.13.2"
+features = ["extension-module"]

@@ -60,6 +60,8 @@ def plugin_new(args):
     from cookiecutter.main import cookiecutter
     if args.type in ('input', 'output', 'transform', 'parser', 'decoder', 'runner'):
         template = f'{os.path.dirname(os.path.abspath(__file__))}/templates/{args.type}'
+        if args.rust_extension:
+            template = template + '_rust'
         plugin_module = f'bulq_{args.type}_{args.plugin_id}'
         plugin_class = ''.join([t.capitalize() for t in plugin_module.split('_')])
         cookiecutter(
@@ -100,6 +102,9 @@ def main():
     parser_plugin_new.add_argument('plugin_id',
                                    type=str,
                                    help='plugin id(snake_case)')
+    parser_plugin_new.add_argument('-r', '--rust-extension',
+                                   help='generate rust extension template',
+                                   action='store_true')
     parser_plugin_new.set_defaults(handler=plugin_new)
 
     parser_plugin_list = parser_plugin_sub.add_parser('list', help='see `plugin list -h`')
