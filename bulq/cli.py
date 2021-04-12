@@ -40,7 +40,7 @@ def get_runner_plugin(conf):
 
 def run(args):
     logger.info(f'bulq v{__version__}')
-    logger.info('start running bulk load')
+    logger.info('start ETL process')
     env = Environment(loader=FileSystemLoader('.'))
     conf_template = env.get_template(args.conf_file)
     env_vars = EnvVars(os.environ)
