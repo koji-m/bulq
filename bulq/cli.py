@@ -39,6 +39,7 @@ def get_runner_plugin(conf):
 
 
 def run(args):
+    logger.info(f'bulq v{__version__}')
     logger.info('start running bulk load')
     env = Environment(loader=FileSystemLoader('.'))
     conf_template = env.get_template(args.conf_file)
@@ -77,7 +78,6 @@ def plugin_list(args):
 
 def main():
     bulq.log.setup()
-    logger.info(f'bulq v{__version__}')
 
     parser = argparse.ArgumentParser(description='bulq - extensible ETL tool')
     subparsers = parser.add_subparsers()
