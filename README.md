@@ -1,6 +1,16 @@
 # bulq
 
-Extensible ETL tool.
+**Extensible ETL tool.**
+
+You can create a data pipeline simply by defining input (data extraction source), transform, and output (data load destination) in a YAML file. You can also increase the number of combinations of input, transform, and output by adding plugins.
+
+# Features
+
+- **No programming is required** - The pipeline configuration is defined in YAML. 
+- **Portable and Scalable** - The pipeline defined in YAML is converted to the pipeline of Apache Beam and executed.
+- **Can be installed with pip** - bulq is a CLI tool written in Python.
+- **Various combinations of ETL** - Build a data pipeline by combining plugins.
+- **Extensible architecture** - Plugins can be built by Apache Beam API for Python.
 
 # Install
 
